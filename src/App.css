@@ -14,25 +14,41 @@ body {
 }
 
 .counter {
-  max-width: 300px;
+  --standart-color: #63DAFC;
+  --disabled-color: #3F7285;
+}
+
+.counter.error {
+  --standart-color: red;
+  --disabled-color: rgba(255, 0, 0, 0.34);
+}
+
+.counter {
+
   margin: 0 auto;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   padding: 15px;
   font-weight: bold;
-  border: 2px solid #63DAFC;
+  border: 2px solid var(--standart-color);
   border-radius: 5px;
+
+}
+
+.counter-main {
+  margin-bottom: 10px;
+  border: 2px solid var(--standart-color);
+  border-radius: 5px;
+
 }
 
 .output {
   display: flex;
   justify-content: center;
-  padding: 20px;
+  padding: 20px 15px;
   font-size: 45px;
-  background-color: #63DAFC;
-  margin-bottom: 10px;
+  background-color: var(--standart-color);
   color: #292C35;
-  border-radius: 5px;
 }
 
 .output.max-value {
@@ -43,28 +59,81 @@ body {
   padding: 20px 10px;
   display: flex;
   justify-content: space-around;
-  border: 2px solid #63DAFC;
+  align-items: center;
+  border: 2px solid var(--standart-color);
   border-radius: 5px;
 }
 
 .counter-btn {
   padding: 0 15px;
+  margin-right: 20px;
   line-height: 35px;
   font-size: 35px;
   font-weight: bold;
-  background-color: #63DAFC;
+  background-color: var(--standart-color);
   border: none;
   border-radius: 5px;
   color: #292C35;
+  cursor: pointer;
 }
 
 .counter-btn:disabled {
-  background-color: #3F7285;
+  background-color: var(--disabled-color);
+  cursor: not-allowed;
 }
 
+.settingsSvg:hover,
 .counter-btn:hover:not(:disabled) {
-  cursor: pointer;
   transition: ease .3s;
   transform: scale(1.1);
 }
+
+.settings {
+  padding: 20px 15px;
+}
+
+.settingsSvg {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  fill: var(--standart-color);
+}
+
+.settingsInputWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.settingsInputLabel {
+  color: var(--standart-color);
+  font-size: 24px;
+  margin-right: 10px;
+}
+
+.settingsInput {
+  color: var(--standart-color);
+  width: 150px;
+  padding: 5px 10px;
+  font-size: 18px;
+  border: 2px solid var(--standart-color);
+  border-radius: 5px;
+  background-color: transparent;
+  outline: none;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.title span {
+  font-size: 20px;
+  color: var(--standart-color);
+}
+
+
+
+
 
