@@ -3,107 +3,78 @@ import Output from "./Output";
 import Button from "./Button";
 import SettingsSvg from "./SettingsSvg";
 import Settings from "./Settings";
+import {useDispatch, useSelector} from "react-redux";
+import {RootStateType} from "../redux/store";
+import {
+    changeSettingsModeAC,
+    increaseOutputValueAC,
+    resetOutputValueAC,
+    setSettingsAC
+} from "../redux/counterReducer";
 
 
 const Counter = () => {
 
+    // redux hooks ............................................................
+
+    const {minValue, maxValue, outputValue, settingsMode} = useSelector((state: RootStateType) => state.counter)
+    const dispatch = useDispatch()
+
+
     // useStates ...............................................................
 
-    const [config, setConfig] = useState({
-        minValue: 0,
-        maxValue: 5
-    })
-    const [minInputValue, setMinInputValue] = useState(config.minValue);
-    const [maxInputValue, setMaxInputValue] = useState(config.maxValue);
-    const [outputValue, setOutputValue] = useState(config.minValue);
-    const [settingsMode, setSettingsMode] = useState(false);
+    const [minInputValue, setMinInputValue] = useState(minValue);
+    const [maxInputValue, setMaxInputValue] = useState(maxValue);
     const [error, setError] = useState('')
-    console.log(config)
+
 
     // useEffects ...............................................................
 
-
-    // Проверяет изменение настроек, а также устанавливает ошибку при недопустимых значениях инпутов
+    // Устанавливает ошибку при недопустимых значениях инпутов
     useEffect(() => {
         checkIsSettingsCorrect() ? setError('') : setError('Incorrect settings')
     }, [maxInputValue, minInputValue])
-
-    // Устанавливает текущее значение счетчика при изменении config
+    // Сбрасывает незасетанные значения инпутов в настройках при отключении сеттингмода
     useEffect(() => {
-        setOutputValue(config.minValue)
-    }, [config])
-
-    // Сбрасывает незасетанные изменения в настройках
-    useEffect(() => {
-        setMaxInputValue(config.maxValue)
-        setMinInputValue(config.minValue)
+        if (!settingsMode) {
+            setMinInputValue(minValue)
+            setMaxInputValue(maxValue)
+        }
     }, [settingsMode])
 
-    // Устанавливает настройки из Local storage при первом рендере
-    useEffect(() => {
-        setConfig(getConfigFromLocalStorage())
-    }, [])
 
-
-    // functions ...............................................................
-
-    // Работа с local storage
-    const setConfigToLocalStorage = () => {
-        const newConfig = {
-            maxValue: maxInputValue,
-            minValue: minInputValue
-        }
-        const newConfigAsString = JSON.stringify(newConfig);
-        localStorage.setItem('counterConfig', newConfigAsString)
-    }
-    const getConfigFromLocalStorage = () => {
-        const newConfig = localStorage.getItem('counterConfig')
-        return newConfig ? JSON.parse(newConfig) : config;
-    }
+    // Functions .................................................................
 
     // Хэндлеры на изменение инпутов
-    const changeMinInputValue = (value: number) => {
-        setMinInputValue(parseInt(value.toString()))
-    }
-    const changeMaxInputValue = (value: number) => {
-        setMaxInputValue(parseInt(value.toString()))
-
-    }
+    // parseInt(value.toString()) не позволяет вводить дробные значения
+    const changeMinInputValue = (value: number) => setMinInputValue(parseInt(value.toString()))
+    const changeMaxInputValue = (value: number) => setMaxInputValue(parseInt(value.toString()))
 
     // Хэндлеры на изменение значения счетчика
-    const incrementOutputValue = () => {
-        if (outputValue >= config.maxValue) return;
-        setOutputValue(outputValue + 1);
+    const increaseOutputValue = () => {
+        if (outputValue >= maxValue) return
+        dispatch(increaseOutputValueAC())
     }
     const resetOutputValue = () => {
-        if (outputValue <= config.minValue) return;
-        setOutputValue(config.minValue);
+        if (outputValue <= minValue) return
+        dispatch(resetOutputValueAC())
     }
 
     // Работа с настройками
-    const changeSettingsMode = () => {
-        setSettingsMode(!settingsMode)
-    }
-    const checkSettingsChanging = () => {
-        const configValueSameAsInputValue = (config.maxValue === maxInputValue) && (config.minValue === minInputValue);
-        return configValueSameAsInputValue;
-    }
+    const changeSettingsMode = () => dispatch(changeSettingsModeAC())
     const checkIsSettingsCorrect = () => {
         const minLessThanMax = minInputValue < maxInputValue
         const valuesAreNotNegative = minInputValue >= 0 && maxInputValue >= 0
 
-
         return minLessThanMax && valuesAreNotNegative
     }
-    const updateConfig = () => {
-        setConfig({
-            minValue: minInputValue,
-            maxValue: maxInputValue
-        })
-        setConfigToLocalStorage()
-        setSettingsMode(false)
-    }
-    
+    const setSettings = () => dispatch(setSettingsAC(minInputValue, maxInputValue))
+
+
+
+
+
+
 
 
 
@@ -118,7 +89,7 @@ const Counter = () => {
             <div className='counter-main'>
                 {
                     !settingsMode
-                        ? <Output value={outputValue} maxValue={config.maxValue}/>
+                        ? <Output value={outputValue} maxValue={maxValue}/>
                         : <Settings
                             minValue={minInputValue}
                             maxValue={maxInputValue}
@@ -133,15 +104,15 @@ const Counter = () => {
                         ? <>
                             <Button
                                 className='counter-btn'
-                                disabled={outputValue === config.maxValue}
-                                onClick={incrementOutputValue}>inc</Button>
+                                disabled={outputValue === maxValue}
+                                onClick={increaseOutputValue}>inc</Button>
                             <Button
                                 className='counter-btn'
-                                disabled={outputValue === config.minValue}
+                                disabled={outputValue === minValue}
                                 onClick={resetOutputValue}>reset</Button>
                         </>
                         : <Button className='counter-btn'
-                                  onClick={updateConfig}
+                                  onClick={setSettings}
                                   disabled={!!error}>set</Button>
                 }
 
