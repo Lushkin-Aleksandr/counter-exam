@@ -103,6 +103,7 @@ const Counter = () => {
         setConfigToLocalStorage()
         setSettingsMode(false)
     }
+    
 
 
 
