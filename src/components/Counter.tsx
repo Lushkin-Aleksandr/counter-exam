@@ -17,7 +17,6 @@ const Counter = () => {
     const [maxInputValue, setMaxInputValue] = useState(config.maxValue);
     const [outputValue, setOutputValue] = useState(config.minValue);
     const [settingsMode, setSettingsMode] = useState(false);
-    const [isSettingsChanged, setIsSettingsChanged] = useState(false);
     const [error, setError] = useState('')
     console.log(config)
 
@@ -26,7 +25,6 @@ const Counter = () => {
 
     // Проверяет изменение настроек, а также устанавливает ошибку при недопустимых значениях инпутов
     useEffect(() => {
-        setIsSettingsChanged(checkSettingsChanging())
         checkIsSettingsCorrect() ? setError('') : setError('Incorrect settings')
     }, [maxInputValue, minInputValue])
 
@@ -91,9 +89,11 @@ const Counter = () => {
         return configValueSameAsInputValue;
     }
     const checkIsSettingsCorrect = () => {
-        const minLessThanMax = minInputValue < maxInputValue;
+        const minLessThanMax = minInputValue < maxInputValue
+        const valuesAreNotNegative = minInputValue >= 0 && maxInputValue >= 0
 
-        return minLessThanMax
+
+        return minLessThanMax && valuesAreNotNegative
     }
     const updateConfig = () => {
         setConfig({
@@ -101,6 +101,7 @@ const Counter = () => {
             maxValue: maxInputValue
         })
         setConfigToLocalStorage()
+        setSettingsMode(false)
     }
 
 
@@ -140,7 +141,7 @@ const Counter = () => {
                         </>
                         : <Button className='counter-btn'
                                   onClick={updateConfig}
-                                  disabled={isSettingsChanged || !!error}>set</Button>
+                                  disabled={!!error}>set</Button>
                 }
 
                 <SettingsSvg callback={changeSettingsMode}/>
